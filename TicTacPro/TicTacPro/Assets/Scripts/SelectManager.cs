@@ -7,26 +7,27 @@ public class SelectionManager : MonoBehaviour
     public Button xButton;
     public Button oButton;
     public Button resetButton;
-    public Button[] gridButtons; // Array for the 9 grid buttons
+    public Button[] gridButtons; // Array to store the 9 buttons
+    public LineRenderer lineRenderer; // LineRenderer to draw the line
 
     private Color originalXColor;
     private Color originalOColor;
-    private Color originalGridColor;
-    private bool gameWon = false; // Prevent further inputs after a win
 
     private enum Selection { None, X, O }
     private Selection currentSelection = Selection.None;
+    private bool gameWon = false;
 
     void Start()
     {
         originalXColor = xButton.GetComponent<Image>().color;
         originalOColor = oButton.GetComponent<Image>().color;
-        originalGridColor = gridButtons[0].GetComponent<Image>().color; // Store default grid button color
 
+        // Initialize button listeners
         xButton.onClick.AddListener(() => ToggleSelection(Selection.X));
         oButton.onClick.AddListener(() => ToggleSelection(Selection.O));
         resetButton.onClick.AddListener(ResetGame);
 
+        // Set listeners for all grid buttons
         foreach (Button button in gridButtons)
         {
             button.onClick.AddListener(() => ChangeGridButtonText(button));
@@ -35,6 +36,8 @@ public class SelectionManager : MonoBehaviour
 
     private void ToggleSelection(Selection selection)
     {
+        if (gameWon) return; // Prevent any action if the game is won
+
         if (currentSelection == selection)
         {
             currentSelection = Selection.None;
@@ -55,11 +58,9 @@ public class SelectionManager : MonoBehaviour
 
     private void ChangeGridButtonText(Button button)
     {
-        if (gameWon) return; // Prevent changing text after a win
-
         TMP_Text buttonText = button.GetComponentInChildren<TMP_Text>();
 
-        if (buttonText != null && string.IsNullOrEmpty(buttonText.text))
+        if (buttonText != null && string.IsNullOrEmpty(buttonText.text) && !gameWon) // Only set text if it's empty and the game isn't won
         {
             if (currentSelection == Selection.X)
             {
@@ -70,43 +71,85 @@ public class SelectionManager : MonoBehaviour
                 buttonText.text = "O";
             }
 
-            CheckWinCondition();
+            // Check if there's a winner after each move
+            CheckForWinner();
         }
     }
 
-    private void CheckWinCondition()
+    private void CheckForWinner()
     {
-        int[,] winPatterns = new int[,]
+        // Winning combinations (index positions of gridButtons)
+        int[][] winningPatterns = new int[][]
         {
-            {0, 1, 2}, {3, 4, 5}, {6, 7, 8}, // Rows
-            {0, 3, 6}, {1, 4, 7}, {2, 5, 8}, // Columns
-            {0, 4, 8}, {2, 4, 6}             // Diagonals
+            new int[] { 0, 1, 2 }, // Row 1
+            new int[] { 3, 4, 5 }, // Row 2
+            new int[] { 6, 7, 8 }, // Row 3
+            new int[] { 0, 3, 6 }, // Column 1
+            new int[] { 1, 4, 7 }, // Column 2
+            new int[] { 2, 5, 8 }, // Column 3
+            new int[] { 0, 4, 8 }, // Diagonal 1
+            new int[] { 2, 4, 6 }  // Diagonal 2
         };
 
-        for (int i = 0; i < winPatterns.GetLength(0); i++)
+        foreach (var pattern in winningPatterns)
         {
-            int a = winPatterns[i, 0];
-            int b = winPatterns[i, 1];
-            int c = winPatterns[i, 2];
+            TMP_Text text1 = gridButtons[pattern[0]].GetComponentInChildren<TMP_Text>();
+            TMP_Text text2 = gridButtons[pattern[1]].GetComponentInChildren<TMP_Text>();
+            TMP_Text text3 = gridButtons[pattern[2]].GetComponentInChildren<TMP_Text>();
 
-            TMP_Text textA = gridButtons[a].GetComponentInChildren<TMP_Text>();
-            TMP_Text textB = gridButtons[b].GetComponentInChildren<TMP_Text>();
-            TMP_Text textC = gridButtons[c].GetComponentInChildren<TMP_Text>();
-
-            if (textA.text != "" && textA.text == textB.text && textA.text == textC.text)
+            // Check if the three cells have the same text (either "X" or "O")
+            if (text1.text == text2.text && text2.text == text3.text && !string.IsNullOrEmpty(text1.text))
             {
+                // Winner found
                 gameWon = true;
-                HighlightWinningButtons(a, b, c);
-                return;
+                // Draw the line over the winning pattern
+                DrawWinningLine(pattern);
+                DisableGridButtons(); // Disable buttons after win
+                break;
             }
         }
     }
 
-    private void HighlightWinningButtons(int a, int b, int c)
+    private void DrawWinningLine(int[] winningPattern)
     {
-        gridButtons[a].GetComponent<Image>().color = Color.blue;
-        gridButtons[b].GetComponent<Image>().color = Color.blue;
-        gridButtons[c].GetComponent<Image>().color = Color.blue;
+        lineRenderer.enabled = true;
+        lineRenderer.startColor = Color.black;
+        lineRenderer.endColor = Color.black;
+
+        // Set the line's width
+        lineRenderer.startWidth = 0.1f;
+        lineRenderer.endWidth = 0.1f;
+
+        Vector3 startPos = gridButtons[winningPattern[0]].transform.position;
+        Vector3 endPos = gridButtons[winningPattern[2]].transform.position;
+
+        Vector3 direction = (endPos - startPos).normalized;
+        float extension = 0.5f;
+
+        startPos -= direction * extension;
+        endPos += direction * extension;
+
+        lineRenderer.positionCount = 2;
+        lineRenderer.SetPosition(0, startPos);
+        lineRenderer.SetPosition(1, endPos);
+    }
+
+
+
+    private void DisableGridButtons()
+    {
+        foreach (Button button in gridButtons)
+        {
+            button.interactable = false; // Disable all grid buttons
+        }
+    }
+
+    private void EnableGridButtons()
+    {
+        foreach (Button button in gridButtons)
+        {
+            button.interactable = true; // Re-enable grid buttons
+        }
     }
 
     private void ResetGame()
@@ -114,17 +157,24 @@ public class SelectionManager : MonoBehaviour
         currentSelection = Selection.None;
         gameWon = false;
 
+        // Reset all grid buttons to empty text
         foreach (Button button in gridButtons)
         {
             TMP_Text buttonText = button.GetComponentInChildren<TMP_Text>();
             if (buttonText != null)
             {
-                buttonText.text = "";
+                buttonText.text = ""; // Clear text
             }
-            button.GetComponent<Image>().color = originalGridColor; // Reset button color
         }
 
+        // Reset button colors
         UpdateButtonColors();
+
+        // Hide the winning line
+        lineRenderer.enabled = false;
+
+        // Re-enable all grid buttons
+        EnableGridButtons();
     }
 
     private Color DarkenColor(Color color)
