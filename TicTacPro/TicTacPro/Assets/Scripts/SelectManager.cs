@@ -65,10 +65,12 @@ public class SelectionManager : MonoBehaviour
             if (currentSelection == Selection.X)
             {
                 buttonText.text = "X";
+                buttonText.color = Color.red; // Set X to red
             }
             else if (currentSelection == Selection.O)
             {
                 buttonText.text = "O";
+                buttonText.color = Color.blue; // Set O to blue
             }
 
             // Check if there's a winner after each move
