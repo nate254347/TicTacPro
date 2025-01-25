@@ -5,26 +5,16 @@ using System.Collections;
 
 public class aiCode : MonoBehaviour
 {
-    public Button xButton;
-    public Button oButton;
     public Button resetButton;
     public Button[] gridButtons;
     public LineRenderer lineRenderer;
+    public TMP_Text resultText;  // Reference to the result text
 
-    private Color originalXColor;
-    private Color originalOColor;
     private bool gameOver = false;
-
-    private enum Selection { None, X, O }
-    private Selection currentSelection = Selection.None;
+    private bool playerTurn = true;  // Player starts first
 
     void Start()
     {
-        originalXColor = xButton.GetComponent<Image>().color;
-        originalOColor = oButton.GetComponent<Image>().color;
-
-        xButton.onClick.AddListener(() => ToggleSelection(Selection.X));
-        oButton.onClick.AddListener(() => ToggleSelection(Selection.O));
         resetButton.onClick.AddListener(ResetGame);
 
         foreach (Button button in gridButtons)
@@ -33,43 +23,25 @@ public class aiCode : MonoBehaviour
         }
     }
 
-    private void ToggleSelection(Selection selection)
-    {
-        if (currentSelection == selection)
-        {
-            currentSelection = Selection.None;
-        }
-        else
-        {
-            currentSelection = selection;
-        }
-
-        UpdateButtonColors();
-    }
-
-    private void UpdateButtonColors()
-    {
-        xButton.GetComponent<Image>().color = (currentSelection == Selection.X) ? DarkenColor(originalXColor) : originalXColor;
-        oButton.GetComponent<Image>().color = (currentSelection == Selection.O) ? DarkenColor(originalOColor) : originalOColor;
-    }
-
     private void PlayerMove(Button button)
     {
-        if (gameOver) return; // Stop if game is over
+        if (gameOver || !playerTurn) return; // Prevent move if game is over or AI's turn
 
         TMP_Text buttonText = button.GetComponentInChildren<TMP_Text>();
         if (buttonText != null && string.IsNullOrEmpty(buttonText.text))
         {
             buttonText.text = "X";
             buttonText.color = Color.red;
+            playerTurn = false; // Disable further moves
 
             if (CheckWinCondition("X"))
             {
                 gameOver = true;
+                resultText.text = "X Wins!";
                 return;
             }
 
-            StartCoroutine(AIMove()); // AI waits before making a move
+            StartCoroutine(AIMove()); // AI makes a move
         }
     }
 
@@ -77,33 +49,129 @@ public class aiCode : MonoBehaviour
     {
         yield return new WaitForSeconds(1f); // Simulate AI thinking time
 
-        if (gameOver) yield break; // Stop if game is already won
+        if (gameOver) yield break;
 
-        foreach (Button button in gridButtons)
+        int bestMove = FindBestMove();
+        if (bestMove != -1)
         {
-            TMP_Text buttonText = button.GetComponentInChildren<TMP_Text>();
+            TMP_Text buttonText = gridButtons[bestMove].GetComponentInChildren<TMP_Text>();
+            buttonText.text = "O";
+            buttonText.color = Color.blue;
+
+            if (CheckWinCondition("O"))
+            {
+                gameOver = true;
+                resultText.text = "O Wins!";
+                yield break;
+            }
+        }
+
+        if (IsBoardFull())  // If the board is full and no one has won, it's a tie
+        {
+            gameOver = true;
+            resultText.text = "It's a Tie!";
+        }
+        else
+        {
+            playerTurn = true; // Allow player to move again
+        }
+    }
+
+    private int FindBestMove()
+    {
+        int bestScore = int.MinValue;
+        int bestMove = -1;
+
+        for (int i = 0; i < gridButtons.Length; i++)
+        {
+            TMP_Text buttonText = gridButtons[i].GetComponentInChildren<TMP_Text>();
             if (buttonText != null && string.IsNullOrEmpty(buttonText.text))
             {
                 buttonText.text = "O";
-                buttonText.color = Color.blue;
+                int score = Minimax(false);
+                buttonText.text = "";
 
-                if (CheckWinCondition("O"))
+                if (score > bestScore)
                 {
-                    gameOver = true;
+                    bestScore = score;
+                    bestMove = i;
                 }
-
-                break; // AI moves only once
             }
         }
+
+        return bestMove;
+    }
+
+    private int Minimax(bool isMaximizing)
+    {
+        string winner = GetWinner();
+        if (winner == "X") return -1;
+        if (winner == "O") return 1;
+        if (IsBoardFull()) return 0;
+
+        int bestScore = isMaximizing ? int.MinValue : int.MaxValue;
+
+        for (int i = 0; i < gridButtons.Length; i++)
+        {
+            TMP_Text buttonText = gridButtons[i].GetComponentInChildren<TMP_Text>();
+            if (buttonText != null && string.IsNullOrEmpty(buttonText.text))
+            {
+                // Make the move
+                buttonText.text = isMaximizing ? "O" : "X";  // AI or Player move
+                int score = Minimax(!isMaximizing);  // Recurse
+                buttonText.text = "";  // Undo the move
+
+                // Update the best score
+                bestScore = isMaximizing ? Mathf.Max(score, bestScore) : Mathf.Min(score, bestScore);
+            }
+        }
+        return bestScore;
+    }
+
+    private string GetWinner()
+    {
+        int[,] winPatterns = new int[,]
+        {
+            { 0, 1, 2 }, { 3, 4, 5 }, { 6, 7, 8 },
+            { 0, 3, 6 }, { 1, 4, 7 }, { 2, 5, 8 },
+            { 0, 4, 8 }, { 2, 4, 6 }
+        };
+
+        foreach (int i in new int[] { 0, 1 })
+        {
+            string symbol = (i == 0) ? "X" : "O";
+            for (int j = 0; j < winPatterns.GetLength(0); j++)
+            {
+                int a = winPatterns[j, 0], b = winPatterns[j, 1], c = winPatterns[j, 2];
+                if (gridButtons[a].GetComponentInChildren<TMP_Text>().text == symbol &&
+                    gridButtons[b].GetComponentInChildren<TMP_Text>().text == symbol &&
+                    gridButtons[c].GetComponentInChildren<TMP_Text>().text == symbol)
+                {
+                    return symbol;
+                }
+            }
+        }
+
+        return null;
     }
 
     private bool CheckWinCondition(string symbol)
     {
+        if (GetWinner() == symbol)
+        {
+            HighlightWinningLine(symbol);
+            return true;
+        }
+        return false;
+    }
+
+    private void HighlightWinningLine(string symbol)
+    {
         int[,] winPatterns = new int[,]
         {
-            { 0, 1, 2 }, { 3, 4, 5 }, { 6, 7, 8 }, // Rows
-            { 0, 3, 6 }, { 1, 4, 7 }, { 2, 5, 8 }, // Columns
-            { 0, 4, 8 }, { 2, 4, 6 }              // Diagonals
+            { 0, 1, 2 }, { 3, 4, 5 }, { 6, 7, 8 },
+            { 0, 3, 6 }, { 1, 4, 7 }, { 2, 5, 8 },
+            { 0, 4, 8 }, { 2, 4, 6 }
         };
 
         for (int i = 0; i < winPatterns.GetLength(0); i++)
@@ -114,31 +182,36 @@ public class aiCode : MonoBehaviour
                 gridButtons[b].GetComponentInChildren<TMP_Text>().text == symbol &&
                 gridButtons[c].GetComponentInChildren<TMP_Text>().text == symbol)
             {
-                HighlightWinningLine(a, b, c);
-                return true;
+                lineRenderer.enabled = true;
+                lineRenderer.startColor = Color.black;
+                lineRenderer.endColor = Color.black;
+                lineRenderer.startWidth = 0.15f;
+                lineRenderer.endWidth = 0.15f;
+                lineRenderer.positionCount = 2;
+                lineRenderer.SetPosition(0, gridButtons[a].transform.position);
+                lineRenderer.SetPosition(1, gridButtons[c].transform.position);
+                return;
             }
         }
-
-        return false;
     }
 
-    private void HighlightWinningLine(int a, int b, int c)
+    private bool IsBoardFull()
     {
-        lineRenderer.enabled = true;
-        lineRenderer.startColor = Color.black;
-        lineRenderer.endColor = Color.black;
-        lineRenderer.startWidth = 0.15f;
-        lineRenderer.endWidth = 0.15f;
-
-        lineRenderer.positionCount = 2;
-        lineRenderer.SetPosition(0, gridButtons[a].transform.position);
-        lineRenderer.SetPosition(1, gridButtons[c].transform.position);
+        foreach (Button button in gridButtons)
+        {
+            TMP_Text buttonText = button.GetComponentInChildren<TMP_Text>();
+            if (buttonText != null && string.IsNullOrEmpty(buttonText.text))
+            {
+                return false;
+            }
+        }
+        return true;
     }
 
     private void ResetGame()
     {
         gameOver = false;
-        currentSelection = Selection.None;
+        playerTurn = true;  // Ensure player starts first
 
         foreach (Button button in gridButtons)
         {
@@ -149,12 +222,7 @@ public class aiCode : MonoBehaviour
             }
         }
 
-        UpdateButtonColors();
         lineRenderer.enabled = false;
-    }
-
-    private Color DarkenColor(Color color)
-    {
-        return new Color(color.r * 0.8f, color.g * 0.8f, color.b * 0.8f, color.a);
+        resultText.text = "";  // Clear result text
     }
 }
