@@ -20,4 +20,13 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Board.unity
     guid: 9fa50bfb8b9231f4984b847f0a80a444
+  - enabled: 1
+    path: Assets/Scenes/AI.unity
+    guid: 0fec7dfea414d4743b7c9341f0351068
+  - enabled: 1
+    path: Assets/Scenes/mediumAI.unity
+    guid: ec7a983229d2c604a8030090842d18d9
+  - enabled: 1
+    path: Assets/Scenes/easyAI.unity
+    guid: 6b87d1a95e92b834f8df4c015f8c91fe
   m_configObjects: {}

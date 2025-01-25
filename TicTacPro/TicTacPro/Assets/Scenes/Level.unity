@@ -754,7 +754,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 578a00cc81c04e44280b7d2770ffc44b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sceneName: Board
+  sceneName: easyAI
 --- !u!114 &579568331
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -901,7 +901,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 578a00cc81c04e44280b7d2770ffc44b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sceneName: Board
+  sceneName: mediumAI
 --- !u!114 &808067483
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1234,7 +1234,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 578a00cc81c04e44280b7d2770ffc44b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sceneName: Board
+  sceneName: AI
 --- !u!114 &1984649533
 MonoBehaviour:
   m_ObjectHideFlags: 0
