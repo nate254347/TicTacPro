@@ -5,6 +5,12 @@ using System.Collections;
 
 public class mediumAICode : MonoBehaviour
 {
+    public AudioSource audioSource;  // Reference to the AudioSource
+    public AudioClip moveSound;      // Sound for placing "X" or "O"
+    public AudioClip winSound;       // Sound for winning
+    public AudioClip tieSound;       // Sound for a tie
+    public AudioClip clickSound;     // Sound for clicking reset button
+
     public Button resetButton;
     public Button[] gridButtons;
     public LineRenderer lineRenderer;
@@ -22,6 +28,13 @@ public class mediumAICode : MonoBehaviour
             button.onClick.AddListener(() => PlayerMove(button));
         }
     }
+    private void PlaySound(AudioClip clip)
+    {
+        if (audioSource != null && clip != null)
+        {
+            audioSource.PlayOneShot(clip);
+        }
+    }
 
     private void PlayerMove(Button button)
     {
@@ -31,6 +44,8 @@ public class mediumAICode : MonoBehaviour
         if (buttonText != null && string.IsNullOrEmpty(buttonText.text))
         {
             buttonText.text = "X";
+            PlaySound(moveSound);
+
             buttonText.color = Color.red;
             playerTurn = false;
 
@@ -38,6 +53,8 @@ public class mediumAICode : MonoBehaviour
             {
                 gameOver = true;
                 resultText.text = "X Wins!";
+                PlaySound(winSound);
+
                 return;
             }
 
@@ -56,12 +73,16 @@ public class mediumAICode : MonoBehaviour
         {
             TMP_Text buttonText = gridButtons[bestMove].GetComponentInChildren<TMP_Text>();
             buttonText.text = "O";
+            PlaySound(moveSound);
+
             buttonText.color = Color.blue;
 
             if (CheckWinCondition("O"))
             {
                 gameOver = true;
                 resultText.text = "O Wins!";
+                PlaySound(winSound);
+
                 yield break;
             }
         }
@@ -70,6 +91,8 @@ public class mediumAICode : MonoBehaviour
         {
             gameOver = true;
             resultText.text = "It's a Tie!";
+            PlaySound(tieSound);
+
         }
         else
         {
@@ -192,6 +215,7 @@ public class mediumAICode : MonoBehaviour
     {
         gameOver = false;
         playerTurn = true;
+        PlaySound(clickSound);
 
         foreach (Button button in gridButtons)
         {
