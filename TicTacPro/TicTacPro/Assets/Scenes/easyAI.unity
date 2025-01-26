@@ -3072,12 +3072,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eaf974d9c31723842bb551127bf77b58, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  xButton: {fileID: 0}
-  oButton: {fileID: 0}
-  resetButton: {fileID: 0}
-  gridButtons: []
-  lineRenderer: {fileID: 0}
-  resultText: {fileID: 0}
+  resetButton: {fileID: 1505397033}
+  gridButtons:
+  - {fileID: 597945951}
+  - {fileID: 1044564592}
+  - {fileID: 937069661}
+  - {fileID: 737720453}
+  - {fileID: 1346134355}
+  - {fileID: 1430713646}
+  - {fileID: 458718732}
+  - {fileID: 94916357}
+  - {fileID: 1826338188}
+  lineRenderer: {fileID: 392675731}
+  resultText: {fileID: 1557365846}
 --- !u!1 &1557365844
 GameObject:
   m_ObjectHideFlags: 0
