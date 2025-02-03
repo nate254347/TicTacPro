@@ -24,6 +24,24 @@ EditorBuildSettings:
     path: Assets/Scenes/AI.unity
     guid: 0fec7dfea414d4743b7c9341f0351068
   - enabled: 1
+    path: Assets/Scenes/AIX.unity
+    guid: 1504d6f85a53b5e49a6f1eb46973e4cb
+  - enabled: 1
+    path: Assets/Scenes/easyAIX.unity
+    guid: adfccaa218259054db9179b2b31d7b6f
+  - enabled: 1
+    path: Assets/Scenes/mediumAIX.unity
+    guid: 09c73511e4e760844bca4a6d2070d2f3
+  - enabled: 1
+    path: Assets/Scenes/select.unity
+    guid: 50e87e5fea879c240a4f82a0f8477a3f
+  - enabled: 1
+    path: Assets/Scenes/selectEasy.unity
+    guid: 59e459d015fb4e84e9fb7f5386be950d
+  - enabled: 1
+    path: Assets/Scenes/selectHard.unity
+    guid: b4b9af3b20acdd0438e971d44494d811
+  - enabled: 1
     path: Assets/Scenes/mediumAI.unity
     guid: ec7a983229d2c604a8030090842d18d9
   - enabled: 1

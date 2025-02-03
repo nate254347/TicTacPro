@@ -269,7 +269,7 @@ GameObject:
   - component: {fileID: 197675200}
   - component: {fileID: 197675199}
   - component: {fileID: 197675198}
-  - component: {fileID: 197675197}
+  - component: {fileID: 197675201}
   m_Layer: 0
   m_Name: QuitButton
   m_TagString: Untagged
@@ -297,18 +297,6 @@ RectTransform:
   m_AnchoredPosition: {x: 200, y: 0}
   m_SizeDelta: {x: 300, y: 300}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &197675197
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 197675195}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: da3101b8d5a1fd24eb20abc53b9baa89, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &197675198
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -353,9 +341,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 197675197}
-        m_TargetAssemblyTypeName: CloseAppButton, Assembly-CSharp
-        m_MethodName: CloseApp
+      - m_Target: {fileID: 197675201}
+        m_TargetAssemblyTypeName: sceneSelectButton, Assembly-CSharp
+        m_MethodName: changeScene
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -403,6 +391,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 197675195}
   m_CullTransparentMesh: 1
+--- !u!114 &197675201
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 197675195}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 578a00cc81c04e44280b7d2770ffc44b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sceneName: MediumAIX
 --- !u!1 &328222591
 GameObject:
   m_ObjectHideFlags: 0
@@ -1160,7 +1161,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 578a00cc81c04e44280b7d2770ffc44b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sceneName: Menu
+  sceneName: mediumAI
 --- !u!114 &1207149945
 MonoBehaviour:
   m_ObjectHideFlags: 0

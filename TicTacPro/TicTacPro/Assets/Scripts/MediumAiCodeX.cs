@@ -2,14 +2,12 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.Collections;
+using System.Collections.Generic;
 
-public class mediumAICode : MonoBehaviour
+public class MediumAICodeX : MonoBehaviour
 {
-    public AudioSource audioSource;  // Reference to the AudioSource
-    public AudioClip moveSound;      // Sound for placing "X" or "O"
-    public AudioClip winSound;       // Sound for winning
-    public AudioClip tieSound;       // Sound for a tie
-    public AudioClip clickSound;     // Sound for clicking reset button
+    public AudioSource audioSource;
+    public AudioClip moveSound, winSound, tieSound, clickSound;
 
     public Button resetButton;
     public Button[] gridButtons;
@@ -17,7 +15,7 @@ public class mediumAICode : MonoBehaviour
     public TMP_Text resultText;
 
     private bool gameOver = false;
-    private bool playerTurn = true;
+    private bool playerTurn = false; // AI goes first
 
     void Start()
     {
@@ -27,7 +25,10 @@ public class mediumAICode : MonoBehaviour
         {
             button.onClick.AddListener(() => PlayerMove(button));
         }
+
+        StartCoroutine(AIMove()); // AI makes the first move
     }
+
     private void PlaySound(AudioClip clip)
     {
         if (audioSource != null && clip != null)
@@ -38,23 +39,21 @@ public class mediumAICode : MonoBehaviour
 
     private void PlayerMove(Button button)
     {
-        if (gameOver || !playerTurn) return;
+        if (gameOver || playerTurn) return; // Player moves second
 
         TMP_Text buttonText = button.GetComponentInChildren<TMP_Text>();
         if (buttonText != null && string.IsNullOrEmpty(buttonText.text))
         {
-            buttonText.text = "X";
+            buttonText.text = "O"; // Player is O
+            buttonText.color = Color.blue;
             PlaySound(moveSound);
+            playerTurn = true;
 
-            buttonText.color = Color.red;
-            playerTurn = false;
-
-            if (CheckWinCondition("X"))
+            if (CheckWinCondition("O"))
             {
                 gameOver = true;
-                resultText.text = "X Wins!";
+                resultText.text = "O Wins!";
                 PlaySound(winSound);
-
                 return;
             }
 
@@ -68,70 +67,27 @@ public class mediumAICode : MonoBehaviour
 
         if (gameOver) yield break;
 
-        int bestMove = FindBestMove();
+        int bestMove = -1;
+
+        // Check for winning move first
+        bestMove = FindWinningMove("X");
         if (bestMove != -1)
         {
-            TMP_Text buttonText = gridButtons[bestMove].GetComponentInChildren<TMP_Text>();
-            buttonText.text = "O";
-            PlaySound(moveSound);
-
-            buttonText.color = Color.blue;
-
-            if (CheckWinCondition("O"))
-            {
-                gameOver = true;
-                resultText.text = "O Wins!";
-                PlaySound(winSound);
-
-                yield break;
-            }
+            MakeMove(bestMove, "X");
+            yield break;
         }
 
-        if (IsBoardFull())
+        // Check for blocking move
+        bestMove = FindWinningMove("O");
+        if (bestMove != -1)
         {
-            gameOver = true;
-            resultText.text = "It's a Tie!";
-            PlaySound(tieSound);
-
-        }
-        else
-        {
-            playerTurn = true;
-        }
-    }
-
-    private int FindBestMove()
-    {
-        // Check if AI can win in one move
-        int winMove = FindWinningMove("O");
-        if (winMove != -1) return winMove;
-
-        // Check if AI needs to block player’s win
-        int blockMove = FindWinningMove("X");
-        if (blockMove != -1) return blockMove;
-
-        // Default behavior: Evaluate other moves
-        int bestMove = -1;
-        float bestScore = float.NegativeInfinity;
-
-        for (int i = 0; i < gridButtons.Length; i++)
-        {
-            TMP_Text buttonText = gridButtons[i].GetComponentInChildren<TMP_Text>();
-            if (buttonText != null && string.IsNullOrEmpty(buttonText.text))
-            {
-                buttonText.text = "O";
-                float score = EvaluateMove();
-                buttonText.text = "";
-
-                if (score > bestScore)
-                {
-                    bestScore = score;
-                    bestMove = i;
-                }
-            }
+            MakeMove(bestMove, "X");
+            yield break;
         }
 
-        return bestMove;
+        // If no winning or blocking move, make a random move excluding the center on the first turn
+        bestMove = FindRandomMove();
+        MakeMove(bestMove, "X");
     }
 
     private int FindWinningMove(string symbol)
@@ -159,6 +115,89 @@ public class mediumAICode : MonoBehaviour
         return -1;
     }
 
+    private int FindRandomMove()
+    {
+        // Make sure to avoid the center spot on the first move
+        List<int> availableMoves = new List<int>();
+
+        for (int i = 0; i < gridButtons.Length; i++)
+        {
+            TMP_Text buttonText = gridButtons[i].GetComponentInChildren<TMP_Text>();
+            if (buttonText != null && string.IsNullOrEmpty(buttonText.text))
+            {
+                // If the first move, avoid the middle
+                if (i != 4)
+                {
+                    availableMoves.Add(i);
+                }
+            }
+        }
+
+        if (availableMoves.Count > 0)
+        {
+            return availableMoves[Random.Range(0, availableMoves.Count)];
+        }
+
+        return -1; // No valid move found
+    }
+
+    private void MakeMove(int index, string symbol)
+    {
+        TMP_Text buttonText = gridButtons[index].GetComponentInChildren<TMP_Text>();
+        if (buttonText != null)
+        {
+            buttonText.text = symbol; // AI is X
+            buttonText.color = Color.red;
+            PlaySound(moveSound);
+
+            if (CheckWinCondition(symbol))
+            {
+                gameOver = true;
+                resultText.text = $"{symbol} Wins!";
+                PlaySound(winSound);
+            }
+            else if (IsBoardFull())
+            {
+                gameOver = true;
+                resultText.text = "It's a Tie!";
+                PlaySound(tieSound);
+            }
+            else
+            {
+                playerTurn = false;
+            }
+        }
+    }
+
+
+    private int FindBestMove()
+    {
+        int bestMove = -1;
+        float bestScore = float.NegativeInfinity;
+
+        for (int i = 0; i < gridButtons.Length; i++)
+        {
+            TMP_Text buttonText = gridButtons[i].GetComponentInChildren<TMP_Text>();
+            if (buttonText != null && string.IsNullOrEmpty(buttonText.text))
+            {
+                buttonText.text = "X";
+                float score = EvaluateMove();
+                buttonText.text = "";
+
+                // Limit the AI's move choices
+                if (score > bestScore && Random.value < 0.8f) // Introduce a randomness factor
+                {
+                    bestScore = score;
+                    bestMove = i;
+                }
+            }
+        }
+
+        return bestMove;
+    }
+
+
+  
 
     private float EvaluateMove()
     {
@@ -173,7 +212,7 @@ public class mediumAICode : MonoBehaviour
         foreach (int i in new int[] { 0, 1 })
         {
             string symbol = (i == 0) ? "X" : "O";
-            float symbolScore = (symbol == "O") ? 1f : -1f;
+            float symbolScore = (symbol == "X") ? 1f : -1f;
 
             for (int j = 0; j < winPatterns.GetLength(0); j++)
             {
@@ -220,7 +259,6 @@ public class mediumAICode : MonoBehaviour
         }
         return false;
     }
-
     private void HighlightWinningLine(int start, int end)
     {
         lineRenderer.enabled = true;
@@ -232,7 +270,6 @@ public class mediumAICode : MonoBehaviour
         lineRenderer.SetPosition(0, gridButtons[start].transform.position);
         lineRenderer.SetPosition(1, gridButtons[end].transform.position);
     }
-
     private bool IsBoardFull()
     {
         foreach (Button button in gridButtons)
@@ -245,11 +282,10 @@ public class mediumAICode : MonoBehaviour
         }
         return true;
     }
-
     private void ResetGame()
     {
         gameOver = false;
-        playerTurn = true;
+        playerTurn = false; // AI still goes first
         PlaySound(clickSound);
 
         foreach (Button button in gridButtons)
@@ -263,5 +299,7 @@ public class mediumAICode : MonoBehaviour
 
         lineRenderer.enabled = false;
         resultText.text = "";
+
+        StartCoroutine(AIMove()); // AI moves first on reset
     }
 }

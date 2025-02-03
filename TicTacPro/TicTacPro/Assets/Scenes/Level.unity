@@ -754,7 +754,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 578a00cc81c04e44280b7d2770ffc44b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sceneName: easyAI
+  sceneName: selectEasy
 --- !u!114 &579568331
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -824,7 +824,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.5518868, g: 1, b: 0.8211564, a: 1}
+  m_Color: {r: 0.042452812, g: 1, b: 0.29113838, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -901,7 +901,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 578a00cc81c04e44280b7d2770ffc44b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sceneName: mediumAI
+  sceneName: select
 --- !u!114 &808067483
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -971,7 +971,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.5518868, g: 1, b: 0.8211564, a: 1}
+  m_Color: {r: 1, g: 0.913718, b: 0, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -1234,7 +1234,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 578a00cc81c04e44280b7d2770ffc44b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sceneName: AI
+  sceneName: selectHard
 --- !u!114 &1984649533
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1304,7 +1304,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.5518868, g: 1, b: 0.8211564, a: 1}
+  m_Color: {r: 0.9716981, g: 0.14208792, b: 0.3419533, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
