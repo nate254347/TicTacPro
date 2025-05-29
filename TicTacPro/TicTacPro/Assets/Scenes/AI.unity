@@ -1033,7 +1033,6 @@ MonoBehaviour:
   winSound: {fileID: 8300000, guid: ab55cfb72049f174cb3ddb1a2c4f4857, type: 3}
   tieSound: {fileID: 8300000, guid: f452bf16a3b742543881960de5a365cb, type: 3}
   clickSound: {fileID: 8300000, guid: abdc774da4d60af4c80a85e502fe1a4a, type: 3}
-  soundClips: []
   resetButton: {fileID: 1899821752}
   gridButtons:
   - {fileID: 565419770}
@@ -2797,8 +2796,8 @@ MonoBehaviour:
   m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
-  m_ScreenMatchMode: 1
+  m_ReferenceResolution: {x: 2000, y: 2000}
+  m_ScreenMatchMode: 2
   m_MatchWidthOrHeight: 0
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96
