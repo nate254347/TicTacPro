@@ -23,6 +23,16 @@ workflows:
           </plist>
           EOF
 
+      - name: Unity build iOS project
+        script: |
+          /Applications/Unity/Hub/Editor/<UnityVersion>/Unity \
+            -batchmode \
+            -projectPath "$CM_BUILD_DIR" \
+            -executeMethod YourBuildScript.BuildiOS \
+            -buildTarget iOS \
+            -quit \
+            -logFile "$CM_BUILD_DIR/unity_build.log"
+
       - name: Build unsigned IPA
         script: |
           xcodebuild \
