@@ -5,21 +5,19 @@ workflows:
     instance_type: mac_mini_m2
     environment:
       xcode: latest
-      # cocoapods: default  # removed because no pods
     scripts:
-      # Removed CocoaPods step since no Podfile
       - name: Build unsigned IPA
         script: |
           xcodebuild \
             -project "$CM_BUILD_DIR/Unity-iPhone.xcodeproj" \
-            -scheme "TicTacPro" \
+            -scheme "Unity-iPhone" \
             -configuration Release \
             -sdk iphoneos \
-            -archivePath "$CM_BUILD_DIR/build/TicTacPro.xcarchive" \
+            -archivePath "$CM_BUILD_DIR/build/Unity-iPhone.xcarchive" \
             clean archive
 
           xcodebuild -exportArchive \
-            -archivePath "$CM_BUILD_DIR/build/TicTacPro.xcarchive" \
+            -archivePath "$CM_BUILD_DIR/build/Unity-iPhone.xcarchive" \
             -exportPath "$CM_BUILD_DIR/build/ios/ipa" \
             -exportOptionsPlist "$CM_BUILD_DIR/ExportOptions.plist"
     artifacts:
