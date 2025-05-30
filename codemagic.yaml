@@ -14,8 +14,9 @@ workflows:
             -configuration Release \
             -sdk iphoneos \
             -archivePath "$CM_BUILD_DIR/build/Unity-iPhone.xcarchive" \
-            clean archive
-            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO
+            clean archive \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO
 
 
           xcodebuild -exportArchive \
