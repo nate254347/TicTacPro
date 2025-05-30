@@ -6,6 +6,23 @@ workflows:
     environment:
       xcode: latest
     scripts:
+      - name: Create ExportOptions.plist
+        script: |
+          cat > "$CM_BUILD_DIR/ExportOptions.plist" << EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+              <key>method</key>
+              <string>ad-hoc</string>
+              <key>signingStyle</key>
+              <string>manual</string>
+              <key>compileBitcode</key>
+              <false/>
+          </dict>
+          </plist>
+          EOF
+
       - name: Build unsigned IPA
         script: |
           xcodebuild \
@@ -17,7 +34,6 @@ workflows:
             clean archive \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO
-
 
           xcodebuild -exportArchive \
             -archivePath "$CM_BUILD_DIR/build/Unity-iPhone.xcarchive" \
