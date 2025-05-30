@@ -1,15 +1,28 @@
-scripts:
-  - name: Build unsigned IPA
-    script: |
-      xcodebuild \
-        -project "$CM_BUILD_DIR/unity-phone.xcodeproj" \
-        -scheme "unity-phone" \
-        -configuration Release \
-        -sdk iphoneos \
-        -archivePath "$CM_BUILD_DIR/build/unity-phone.xcarchive" \
-        clean archive
+workflows:
+  unsigned-ios-build:
+    name: Unsigned iOS Build
+    max_build_duration: 30
+    instance_type: mac_mini_m2
+    environment:
+      xcode: latest
+      # cocoapods: default  # you can remove this line too if no pods
+    scripts:
+      # Remove this step:
+      # - name: Install CocoaPods dependencies
+      #   script: pod install
+      - name: Build unsigned IPA
+        script: |
+          xcodebuild \
+            -workspace "$CM_BUILD_DIR/TicTacPro.xcworkspace" \
+            -scheme "TicTacPro" \
+            -configuration Release \
+            -sdk iphoneos \
+            -archivePath "$CM_BUILD_DIR/build/TicTacPro.xcarchive" \
+            clean archive
 
-      xcodebuild -exportArchive \
-        -archivePath "$CM_BUILD_DIR/build/unity-phone.xcarchive" \
-        -exportPath "$CM_BUILD_DIR/build/ios/ipa" \
-        -exportOptionsPlist "$CM_BUILD_DIR/ExportOptions.plist"
+          xcodebuild -exportArchive \
+            -archivePath "$CM_BUILD_DIR/build/TicTacPro.xcarchive" \
+            -exportPath "$CM_BUILD_DIR/build/ios/ipa" \
+            -exportOptionsPlist "$CM_BUILD_DIR/ExportOptions.plist"
+    artifacts:
+      - build/ios/ipa/*.ipa
