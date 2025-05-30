@@ -5,15 +5,13 @@ workflows:
     instance_type: mac_mini_m2
     environment:
       xcode: latest
-      # cocoapods: default  # you can remove this line too if no pods
+      # cocoapods: default  # removed because no pods
     scripts:
-      # Remove this step:
-      # - name: Install CocoaPods dependencies
-      #   script: pod install
+      # Removed CocoaPods step since no Podfile
       - name: Build unsigned IPA
         script: |
           xcodebuild \
-            -workspace "$CM_BUILD_DIR/TicTacPro.xcworkspace" \
+            -project "$CM_BUILD_DIR/TicTacPro.xcodeproj" \
             -scheme "TicTacPro" \
             -configuration Release \
             -sdk iphoneos \
