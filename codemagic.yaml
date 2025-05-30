@@ -7,8 +7,7 @@ workflows:
       xcode: latest
       cocoapods: default
     scripts:
-      - name: Install CocoaPods dependencies
-        script: pod install
+
       - name: Build unsigned IPA
         script: |
           xcodebuild \
