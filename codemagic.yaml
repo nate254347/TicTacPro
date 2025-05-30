@@ -11,7 +11,7 @@ workflows:
       - name: Build unsigned IPA
         script: |
           xcodebuild \
-            -project "$CM_BUILD_DIR/TicTacPro.xcodeproj" \
+            -project "$CM_BUILD_DIR/Unity-iPhone.xcodeproj" \
             -scheme "TicTacPro" \
             -configuration Release \
             -sdk iphoneos \
